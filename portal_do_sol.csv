@@ -1,0 +1,7 @@
+input,start_time,end_time,species_name,confidence
+"/home/jlxmns/Documents/Ciência da Computação/P8/ProgramacaoComputadores/bird-sound-project/test_audios/portal_do_sol.wav","00:00:03.00","00:00:06.00","Nyctidromus albicollis_Common Pauraque",0.684516
+"/home/jlxmns/Documents/Ciência da Computação/P8/ProgramacaoComputadores/bird-sound-project/test_audios/portal_do_sol.wav","00:00:03.00","00:00:06.00","Antrostomus carolinensis_Chuck-will's-widow",0.199139
+"/home/jlxmns/Documents/Ciência da Computação/P8/ProgramacaoComputadores/bird-sound-project/test_audios/portal_do_sol.wav","00:00:03.00","00:00:06.00","Engine_Engine",0.138954
+"/home/jlxmns/Documents/Ciência da Computação/P8/ProgramacaoComputadores/bird-sound-project/test_audios/portal_do_sol.wav","00:00:06.00","00:00:09.00","Nyctidromus albicollis_Common Pauraque",0.699715
+"/home/jlxmns/Documents/Ciência da Computação/P8/ProgramacaoComputadores/bird-sound-project/test_audios/portal_do_sol.wav","00:00:06.00","00:00:09.00","Engine_Engine",0.442902
+"/home/jlxmns/Documents/Ciência da Computação/P8/ProgramacaoComputadores/bird-sound-project/test_audios/portal_do_sol.wav","00:00:09.00","00:00:11.80","Otus bakkamoena_Indian Scops-Owl",0.180396
