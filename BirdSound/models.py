@@ -23,8 +23,8 @@ class User(AbstractUser):
 class Bird(models.Model):
     common_name = models.CharField(max_length=200)
     scientific_name = models.CharField(max_length=200, unique=True)
-    order = models.CharField(max_length=100, blank=True)
-    family = models.CharField(max_length=100, blank=True)
+    order = models.CharField(max_length=100, null=True, blank=True)
+    family = models.CharField(max_length=100, null=True, blank=True)
 
     wingspan = models.DecimalField(
         max_digits=5, decimal_places=1, null=True, blank=True
@@ -32,11 +32,11 @@ class Bird(models.Model):
     weight = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     length = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
 
-    habitat = models.TextField(blank=True)
-    conservation_status = models.CharField(max_length=50, blank=True)
+    habitat = models.TextField(null=True, blank=True)
+    conservation_status = models.CharField(max_length=50, null=True, blank=True)
 
     image = models.ImageField(upload_to="birds/", null=True, blank=True)
-    description = models.TextField(blank=True)
+    description = models.TextField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
