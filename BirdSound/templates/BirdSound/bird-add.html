@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Bird — Bird Guide</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@300..600&display=swap"
+          rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <style type="text/tailwindcss">
+        @theme {
+            --font-display: 'Lora', 'Georgia', serif;
+            --font-body: 'Inter', 'Helvetica Neue', sans-serif;
+
+            --color-bg: #f5f2ea;
+            --color-surface: #faf8f2;
+            --color-surface-2: #fffdf8;
+            --color-surface-offset: #edeadf;
+            --color-surface-dynamic: #e4e0d4;
+            --color-divider: #d6d2c4;
+            --color-border: #ccc8b8;
+
+            --color-text: #241f14;
+            --color-text-muted: #6b6454;
+            --color-text-faint: #a89e8a;
+            --color-text-inverse: #f8f5ec;
+
+            --color-primary: #2d6a4f;
+            --color-primary-hover: #1b5438;
+            --color-primary-active: #103d27;
+            --color-primary-highlight: #c8ddd5;
+
+            --color-amber: #a05c1a;
+            --color-amber-highlight: #f0e0c8;
+            --color-red-status: #8b2020;
+            --color-red-highlight: #f0cccc;
+            --color-blue-status: #1a5480;
+            --color-blue-highlight: #c8ddf0;
+
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.25rem;
+            --radius-full: 9999px;
+        }
+
+        [data-theme="dark"] {
+            --color-bg: #141210;
+            --color-surface: #1a1815;
+            --color-surface-2: #1f1d1a;
+            --color-surface-offset: #1d1b18;
+            --color-surface-dynamic: #2a2822;
+            --color-divider: #2e2c26;
+            --color-border: #3a3830;
+
+            --color-text: #d8d2c0;
+            --color-text-muted: #7a7260;
+            --color-text-faint: #5a5448;
+            --color-text-inverse: #2a2820;
+
+            --color-primary: #52a882;
+            --color-primary-hover: #3a9068;
+            --color-primary-active: #2a7050;
+            --color-primary-highlight: #213028;
+
+            --color-amber: #d48c42;
+            --color-amber-highlight: #3a2818;
+            --color-red-status: #d46060;
+            --color-red-highlight: #2e1818;
+            --color-blue-status: #5090c8;
+            --color-blue-highlight: #182438;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100dvh;
+            line-height: 1.6;
+            transition: background-color 250ms ease, color 250ms ease;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 3px;
+            border-radius: var(--radius-sm);
+        }
+
+        ::selection {
+            background: color-mix(in oklch, var(--color-primary) 25%, transparent);
+            color: var(--color-text);
+        }
+
+        .site-header {
+            background: color-mix(in oklch, var(--color-surface) 90%, transparent);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid oklch(from var(--color-text) l c h / 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+
+        .theme-toggle {
+            background: var(--color-surface-offset);
+            border: 1px solid oklch(from var(--color-text) l c h / 0.1);
+            border-radius: var(--radius-full);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+            transition: background 180ms ease, color 180ms ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--color-surface-dynamic);
+            color: var(--color-text);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.9rem;
+            background: var(--color-surface-offset);
+            border: 1px solid oklch(from var(--color-text) l c h / 0.1);
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+        }
+
+        .back-btn:hover {
+            background: var(--color-surface-dynamic);
+            color: var(--color-text);
+            border-color: oklch(from var(--color-text) l c h / 0.2);
+        }
+
+        .hero-band {
+            background: linear-gradient(
+                    135deg,
+                    color-mix(in oklch, var(--color-primary) 12%, var(--color-bg)) 0%,
+                    var(--color-bg) 60%
+            );
+            border-bottom: 1px solid oklch(from var(--color-text) l c h / 0.07);
+        }
+
+        .form-shell {
+            background: var(--color-surface);
+            border: 1px solid oklch(from var(--color-text) l c h / 0.08);
+            border-radius: var(--radius-2xl);
+            overflow: hidden;
+            box-shadow: 0 4px 24px oklch(0.2 0.05 130 / 0.07);
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--color-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--color-text-faint);
+            margin-bottom: 0.35rem;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            background: var(--color-surface-2);
+            border: 1px solid oklch(from var(--color-text) l c h / 0.14);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            color: var(--color-text);
+            transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+        }
+
+        .field-input:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-primary) 15%, transparent);
+            outline: none;
+        }
+
+        .field-input::placeholder {
+            color: var(--color-text-faint);
+        }
+
+        textarea.field-input {
+            resize: vertical;
+            min-height: 110px;
+            line-height: 1.6;
+        }
+
+        .required-mark {
+            color: var(--color-red-status);
+            margin-left: 0.15rem;
+        }
+
+        .file-drop {
+            border: 2px dashed oklch(from var(--color-text) l c h / 0.15);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 180ms ease, background 180ms ease;
+            background: var(--color-surface-offset);
+            position: relative;
+        }
+
+        .file-drop:hover,
+        .file-drop.dragover {
+            border-color: var(--color-primary);
+            background: color-mix(in oklch, var(--color-primary) 6%, var(--color-surface-offset));
+        }
+
+        .file-drop input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .submit-btn {
+            padding: 0.7rem 1.5rem;
+            background: var(--color-primary);
+            border: none;
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--color-text-inverse);
+            transition: background 180ms ease, opacity 180ms ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .submit-btn:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .submit-btn:active {
+            background: var(--color-primary-active);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            padding: 0.7rem 1.2rem;
+            background: transparent;
+            border: 1px solid oklch(from var(--color-text) l c h / 0.15);
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            transition: background 180ms ease, color 180ms ease;
+        }
+
+        .secondary-btn:hover {
+            background: var(--color-surface-dynamic);
+            color: var(--color-text);
+        }
+
+        .helper-text {
+            font-size: 0.8rem;
+            color: var(--color-text-faint);
+            margin-top: 0.35rem;
+        }
+
+        .error-box {
+            display: none;
+            padding: 0.85rem 1rem;
+            background: color-mix(in oklch, var(--color-red-status) 10%, var(--color-surface));
+            border: 1px solid color-mix(in oklch, var(--color-red-status) 20%, transparent);
+            border-radius: var(--radius-lg);
+            color: var(--color-red-status);
+            font-size: 0.88rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            padding: 0.65rem 1.25rem;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 20px oklch(0.2 0.05 130 / 0.18);
+            opacity: 0;
+            transition: opacity 220ms ease, transform 220ms ease;
+            z-index: 100;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            background: var(--color-primary);
+            color: var(--color-text-inverse);
+        }
+
+        .toast.error {
+            background: var(--color-red-status);
+            color: #fff;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .fade-up {
+            animation: fadeUp 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div style="max-width:1200px; margin-inline:auto; padding:0 1.25rem;">
+        <div style="display:flex; align-items:center; justify-content:space-between; height:60px; gap:1rem;">
+            <a href="/"
+               style="display:flex; align-items:center; gap:0.6rem; text-decoration:none; color:var(--color-text); flex-shrink:0;">
+                <svg aria-label="Bird Guide logo" width="32" height="32" viewBox="0 0 32 32" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="15" fill="color-mix(in oklch, var(--color-primary) 15%, transparent)"
+                            stroke="var(--color-primary)" stroke-width="1.2"/>
+                    <ellipse cx="16" cy="17" rx="5" ry="2.2" fill="var(--color-primary)" transform="rotate(-8 16 17)"/>
+                    <path d="M11 16 Q5 11 3 14 Q7 17 11 17Z" fill="var(--color-primary)"/>
+                    <path d="M21 16 Q27 11 29 14 Q25 17 21 17Z" fill="var(--color-primary)"/>
+                    <path d="M13.5 19.5 Q11 23 9 24" stroke="var(--color-primary)" stroke-width="1.4"
+                          stroke-linecap="round"/>
+                    <path d="M14.5 19.5 Q13 23.5 12 25" stroke="var(--color-primary)" stroke-width="1.4"
+                          stroke-linecap="round"/>
+                </svg>
+                <span style="font-family:var(--font-display); font-size:1.2rem; font-weight:600; letter-spacing:-0.01em;">Bird Guide</span>
+            </a>
+
+            <button class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</header>
+
+<section class="hero-band" style="padding:2.4rem 1.25rem 2rem;">
+    <div style="max-width:1200px; margin-inline:auto;">
+        <a href="/" class="back-btn" style="margin-bottom:1rem;">
+            <i data-lucide="arrow-left" style="width:14px; height:14px;"></i>
+            Back to birds
+        </a>
+        <p style="font-family:var(--font-display); font-size:clamp(1.7rem, 4vw, 2.5rem); font-weight:600; line-height:1.15; color:var(--color-text); margin-bottom:0.45rem;">
+            Add a New Bird
+        </p>
+        <p style="font-size:0.95rem; color:var(--color-text-muted); max-width:60ch;">
+            Create a new bird entry with taxonomy, measurements, habitat, conservation status, description, and an
+            optional image. Common name and scientific name are required.
+        </p>
+    </div>
+</section>
+
+<main style="max-width:1000px; margin-inline:auto; padding:2rem 1.25rem 4rem;">
+    <section class="form-shell fade-up">
+        <div style="padding:1.3rem 1.5rem; border-bottom:1px solid oklch(from var(--color-text) l c h / 0.07); display:flex; align-items:center; gap:0.6rem;">
+            <i data-lucide="bird" style="width:16px; height:16px; color:var(--color-primary);"></i>
+            <h1 style="font-family:var(--font-display); font-size:1.1rem; font-weight:600; color:var(--color-text);">
+                Bird Information
+            </h1>
+        </div>
+
+        <form id="create-form" style="padding:1.5rem; display:flex; flex-direction:column; gap:2rem;" novalidate>
+            <div id="form-error" class="error-box" role="alert"></div>
+
+            <fieldset style="border:none; padding:0; display:flex; flex-direction:column; gap:0.8rem;">
+                <p class="section-label">Required</p>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:0.9rem;">
+                    <div>
+                        <label class="field-label" for="common_name">
+                            Common name <span class="required-mark">*</span>
+                        </label>
+                        <input class="field-input" id="common_name" name="common_name" type="text"
+                               placeholder="e.g. Atlantic Puffin" required>
+                    </div>
+
+                    <div>
+                        <label class="field-label" for="scientific_name">
+                            Scientific name <span class="required-mark">*</span>
+                        </label>
+                        <input class="field-input" id="scientific_name" name="scientific_name" type="text"
+                               placeholder="e.g. Fratercula arctica" required>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset style="border:none; padding:0; display:flex; flex-direction:column; gap:0.8rem;">
+                <p class="section-label">Taxonomy</p>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:0.9rem;">
+                    <div>
+                        <label class="field-label" for="order">Order</label>
+                        <input class="field-input" id="order" name="order" type="text"
+                               placeholder="e.g. Charadriiformes">
+                    </div>
+
+                    <div>
+                        <label class="field-label" for="family">Family</label>
+                        <input class="field-input" id="family" name="family" type="text" placeholder="e.g. Alcidae">
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset style="border:none; padding:0; display:flex; flex-direction:column; gap:0.8rem;">
+                <p class="section-label">Measurements</p>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:0.9rem;">
+                    <div>
+                        <label class="field-label" for="length">Length (cm)</label>
+                        <input class="field-input" id="length" name="length" type="number" step="any" min="0"
+                               placeholder="e.g. 32">
+                    </div>
+
+                    <div>
+                        <label class="field-label" for="wingspan">Wingspan (cm)</label>
+                        <input class="field-input" id="wingspan" name="wingspan" type="number" step="any" min="0"
+                               placeholder="e.g. 58">
+                    </div>
+
+                    <div>
+                        <label class="field-label" for="weight">Weight (g)</label>
+                        <input class="field-input" id="weight" name="weight" type="number" step="any" min="0"
+                               placeholder="e.g. 480">
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset style="border:none; padding:0; display:flex; flex-direction:column; gap:0.8rem;">
+                <p class="section-label">Habitat & Status</p>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:0.9rem;">
+                    <div>
+                        <label class="field-label" for="conservation_status">Conservation status</label>
+                        <select class="field-input" id="conservation_status" name="conservation_status">
+                            <option value="">— not set —</option>
+                            <option value="LC">Least Concern (LC)</option>
+                            <option value="NT">Near Threatened (NT)</option>
+                            <option value="VU">Vulnerable (VU)</option>
+                            <option value="EN">Endangered (EN)</option>
+                            <option value="CR">Critically Endangered (CR)</option>
+                            <option value="EW">Extinct in the Wild (EW)</option>
+                            <option value="EX">Extinct (EX)</option>
+                            <option value="DD">Data Deficient (DD)</option>
+                            <option value="NE">Not Evaluated (NE)</option>
+                            <option value="CD">Conservation Dependent (CD)</option>
+                        </select>
+                    </div>
+
+                    <div style="grid-column:1 / -1;">
+                        <label class="field-label" for="habitat">Habitat</label>
+                        <textarea class="field-input" id="habitat" name="habitat"
+                                  placeholder="Describe where this bird lives…"></textarea>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset style="border:none; padding:0; display:flex; flex-direction:column; gap:0.8rem;">
+                <p class="section-label">Description</p>
+                <div>
+                    <label class="field-label" for="description">Description</label>
+                    <textarea class="field-input" id="description" name="description"
+                              placeholder="Add notes about appearance, behavior, or identifying features…"></textarea>
+                </div>
+            </fieldset>
+
+            <fieldset style="border:none; padding:0; display:flex; flex-direction:column; gap:0.8rem;">
+                <p class="section-label">Image</p>
+                <div class="file-drop" id="file-drop"
+                     ondragover="event.preventDefault(); this.classList.add('dragover')"
+                     ondragleave="this.classList.remove('dragover')"
+                     ondrop="handleDrop(event)">
+                    <input type="file" id="image-file" accept="image/*" onchange="handleFileSelect(event)">
+                    <div id="file-drop-content"
+                         style="display:flex; flex-direction:column; align-items:center; gap:0.5rem; pointer-events:none;">
+                        <i data-lucide="image-plus" style="width:28px; height:28px; color:var(--color-text-faint);"></i>
+                        <span style="font-size:0.85rem; color:var(--color-text-muted);">Click or drag an image here</span>
+                        <span style="font-size:0.75rem; color:var(--color-text-faint);">Optional. Accepted by your API as image/*</span>
+                    </div>
+                </div>
+                <p class="helper-text">The file will be sent as <code>file</code>, and all other fields will be sent as
+                    plain form-data keys.</p>
+            </fieldset>
+
+            <div style="display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap; padding-top:0.5rem; border-top:1px solid oklch(from var(--color-text) l c h / 0.07);">
+                <button type="submit" class="submit-btn" id="submit-btn">
+                    <i data-lucide="plus-circle" style="width:15px; height:15px;"></i>
+                    Create bird
+                </button>
+
+                <a href="/" class="secondary-btn">Cancel</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+<script>
+    (function () {
+        const t = document.querySelector('[data-theme-toggle]');
+        const r = document.documentElement;
+        let d = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        r.setAttribute('data-theme', d);
+        updateToggleIcon(d);
+
+        t && t.addEventListener('click', () => {
+            d = d === 'dark' ? 'light' : 'dark';
+            r.setAttribute('data-theme', d);
+            t.setAttribute('aria-label', 'Switch to ' + (d === 'dark' ? 'light' : 'dark') + ' mode');
+            updateToggleIcon(d);
+        });
+
+        function updateToggleIcon(mode) {
+            if (!t) return;
+            t.innerHTML = mode === 'dark'
+                ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+                : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        }
+    })();
+
+    let toastTimer;
+
+    function showToast(message, type = 'success') {
+        const el = document.getElementById('toast');
+        clearTimeout(toastTimer);
+        el.className = `toast ${type}`;
+        el.innerHTML = type === 'success'
+            ? '<i data-lucide="check-circle" style="width:15px;height:15px;flex-shrink:0;"></i>' + message
+            : '<i data-lucide="alert-circle" style="width:15px;height:15px;flex-shrink:0;"></i>' + message;
+        lucide.createIcons({nodes: [el]});
+        requestAnimationFrame(() => el.classList.add('show'));
+        toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    function showError(message) {
+        const box = document.getElementById('form-error');
+        box.textContent = message;
+        box.style.display = 'block';
+    }
+
+    function clearError() {
+        const box = document.getElementById('form-error');
+        box.textContent = '';
+        box.style.display = 'none';
+    }
+
+    function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (file) showFilePreview(file);
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        document.getElementById('file-drop').classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            document.getElementById('image-file').files = dt.files;
+            showFilePreview(file);
+        }
+    }
+
+    function showFilePreview(file) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+            document.getElementById('file-drop-content').innerHTML = `
+          <img src="${ev.target.result}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:0.25rem;">
+          <span style="font-size:0.78rem;color:var(--color-text-muted);">${file.name}</span>
+          <span style="font-size:0.72rem;color:var(--color-text-faint);">Click to change</span>
+        `;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function submitCreate(e) {
+        e.preventDefault();
+        clearError();
+
+        const commonName = document.getElementById('common_name').value.trim();
+        const scientificName = document.getElementById('scientific_name').value.trim();
+
+        if (!commonName || !scientificName) {
+            showError('Common name and scientific name are required.');
+            showToast('Please fill in the required fields.', 'error');
+            return;
+        }
+
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i data-lucide="loader-circle" style="width:15px;height:15px;animation:spin 1s linear infinite;"></i> Creating…';
+        lucide.createIcons({nodes: [submitBtn]});
+
+        const form = document.getElementById('create-form');
+        const fd = new FormData();
+
+        ['common_name', 'scientific_name', 'order', 'family', 'habitat', 'conservation_status', 'description'].forEach(f => {
+            const val = form.querySelector(`[name="${f}"]`).value.trim();
+            if (val !== '') fd.append(f, val);
+        });
+
+        ['length', 'wingspan', 'weight'].forEach(f => {
+            const val = form.querySelector(`[name="${f}"]`).value.trim();
+            if (val !== '') fd.append(f, val);
+        });
+
+        const fileInput = document.getElementById('image-file');
+        if (fileInput.files.length > 0) {
+            fd.append('file', fileInput.files[0]);
+        }
+
+        try {
+            const res = await fetch('/birds', {
+                method: 'POST',
+                body: fd
+            });
+
+            if (!res.ok) {
+                const body = await res.text();
+                throw new Error(`${res.status}: ${body.slice(0, 180)}`);
+            }
+
+            const created = await res.json();
+            showToast('Bird created successfully');
+
+            setTimeout(() => {
+                if (created && created.id != null) {
+                    window.location.href = `/bird/${created.id}`;
+                } else {
+                    window.location.href = '/';
+                }
+            }, 400);
+        } catch (err) {
+            showError(err.message || 'Could not create bird.');
+            showToast('Could not create bird.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i data-lucide="plus-circle" style="width:15px;height:15px;"></i> Create bird';
+            lucide.createIcons({nodes: [submitBtn]});
+        }
+    }
+
+    document.getElementById('create-form').addEventListener('submit', submitCreate);
+    lucide.createIcons();
+</script>
+</body>
+</html>

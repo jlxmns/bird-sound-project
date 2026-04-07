@@ -16,6 +16,14 @@ api.mount_django("/media", clear_root_path=True)
 async def index(request: Request):
     return render(request, "BirdSound/bird-list.html")
 
+@api.get("/bird/{pk}")
+async def bird_detail(request: Request, pk: int):
+    return render(request, "BirdSound/bird-detail.html", {"pk": pk})
+
+@api.get("/bird/add")
+async def bird_add(request: Request):
+    return render(request, "BirdSound/bird-add.html")
+
 @api.viewset("/birds")
 class BirdViewSet(ModelViewSet):
     queryset = Bird.objects.all()
@@ -57,8 +65,6 @@ class BirdViewSet(ModelViewSet):
 
     async def partial_update(self, request: Request, pk: int, data: Annotated[UpdateBirdSerializer, Form()], file: Annotated[UploadFile | None, File(max_size=FileSize.MB_50, allowed_types="image/*")] = None):
         """PATCH /birds/{pk} - Partially update a bird."""
-        print(file)
-        print(file.file)
         bird = await self.get_object(pk)
         for k, v in data.dump(exclude_unset=True).items():
             if v is not None:
