@@ -11,6 +11,7 @@ load_dotenv()
 
 NUTHATCH_API_KEY = os.environ.get("NUTHATCH_API_KEY")
 
+
 class Command(BaseCommand):
     help = "Seeds the database with 30 birds from the Nuthatch API"
 
@@ -25,8 +26,8 @@ class Command(BaseCommand):
             headers={"API-Key": NUTHATCH_API_KEY},
             params={
                 "pageSize": 30,
-                "page":     1,
-                "hasImg":   True,
+                "page": 1,
+                "hasImg": True,
             },
         )
         response.raise_for_status()
@@ -42,24 +43,28 @@ class Command(BaseCommand):
                 continue
 
             bird = Bird(
-                common_name          = b.get("name"),
-                scientific_name      = b.get("sciName"),
-                order                = b.get("order") or None,
-                family               = b.get("family") or None,
-                conservation_status  = b.get("status") or None,
-                wingspan             = b.get("wingspanMax") or None,
-                length               = b.get("lengthMax") or None,
+                common_name=b.get("name"),
+                scientific_name=b.get("sciName"),
+                order=b.get("order") or None,
+                family=b.get("family") or None,
+                conservation_status=b.get("status") or None,
+                wingspan=b.get("wingspanMax") or None,
+                length=b.get("lengthMax") or None,
             )
 
             images = b.get("images", [])
             if images and images[0]:
                 image_url = images[0]
                 try:
-                    img_response = httpx.get(image_url, timeout=15, follow_redirects=True)
+                    img_response = httpx.get(
+                        image_url, timeout=15, follow_redirects=True
+                    )
                     img_response.raise_for_status()
 
                     filename = image_url.split("/")[-1].split("?")[0]
-                    if not filename.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+                    if not filename.lower().endswith(
+                        (".jpg", ".jpeg", ".png", ".webp")
+                    ):
                         filename += ".jpg"
 
                     bird.image.save(
@@ -69,12 +74,16 @@ class Command(BaseCommand):
                     )
                 except Exception as e:
                     self.stdout.write(
-                        self.style.WARNING(f"  Could not download image for {b['name']}: {e}")
+                        self.style.WARNING(
+                            f"  Could not download image for {b['name']}: {e}"
+                        )
                     )
 
             bird.save()
             created += 1
-            self.stdout.write(self.style.SUCCESS(f"  Created: {b['name']} ({b['sciName']})"))
+            self.stdout.write(
+                self.style.SUCCESS(f"  Created: {b['name']} ({b['sciName']})")
+            )
 
         self.stdout.write(
             self.style.SUCCESS(f"\nDone. {created} created, {skipped} skipped.")

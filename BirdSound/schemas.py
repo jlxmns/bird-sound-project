@@ -1,5 +1,4 @@
-import msgspec
-from django_bolt.serializers import Serializer, field
+from django_bolt.serializers import Serializer
 
 
 class BirdSerializer(Serializer):
@@ -17,8 +16,15 @@ class BirdSerializer(Serializer):
 
     class Config:
         field_sets = {
-            "list": ["id", "common_name", "scientific_name", "habitat", "conservation_status"],
+            "list": [
+                "id",
+                "common_name",
+                "scientific_name",
+                "habitat",
+                "conservation_status",
+            ],
         }
+
 
 class CreateBirdSerializer(Serializer, omit_defaults=True):
     common_name: str
@@ -31,6 +37,7 @@ class CreateBirdSerializer(Serializer, omit_defaults=True):
     habitat: str | None = None
     conservation_status: str | None = None
     description: str | None = None
+
 
 class UpdateBirdSerializer(Serializer, omit_defaults=True):
     common_name: str | None = None

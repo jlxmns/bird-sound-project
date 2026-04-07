@@ -4,25 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('BirdSound', '0002_rename_height_bird_length'),
+        ("BirdSound", "0002_rename_height_bird_length"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='bird',
-            name='description',
+            model_name="bird",
+            name="description",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='bird',
-            name='family',
+            model_name="bird",
+            name="family",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AlterField(
-            model_name='bird',
-            name='order',
+            model_name="bird",
+            name="order",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
     ]
