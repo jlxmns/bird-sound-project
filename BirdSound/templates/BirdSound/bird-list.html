@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bird Guide</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@300..600&display=swap"
+          rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <style type="text/tailwindcss">
+        /* ─── Art direction ───────────────────────────────────────────────────────────
+           Concept: Field guide / nature atlas for birds
+           Tone: Warm, earthy, organic — like aged paper and forest greens
+           Palette: Warm parchment surfaces + deep forest green accent + clay brown secondary
+           Typography: Lora (display, editorial serif) + Inter (body, clean legibility)
+           Density: Comfortable — generous spacing, breathing room for imagery
+        ──────────────────────────────────────────────────────────────────────────── */
+
+        @theme {
+            --font-display: 'Lora', 'Georgia', serif;
+            --font-body: 'Inter', 'Helvetica Neue', sans-serif;
+
+            /* Custom nature palette */
+            --color-bg: #f5f2ea;
+            --color-surface: #faf8f2;
+            --color-surface-2: #fffdf8;
+            --color-surface-offset: #edeadf;
+            --color-surface-dynamic: #e4e0d4;
+            --color-divider: #d6d2c4;
+            --color-border: #ccc8b8;
+
+            --color-text: #241f14;
+            --color-text-muted: #6b6454;
+            --color-text-faint: #a89e8a;
+            --color-text-inverse: #f8f5ec;
+
+            /* Forest green primary */
+            --color-primary: #2d6a4f;
+            --color-primary-hover: #1b5438;
+            --color-primary-active: #103d27;
+            --color-primary-highlight: #c8ddd5;
+
+            /* Clay/amber accent — conservation status badges */
+            --color-amber: #a05c1a;
+            --color-amber-highlight: #f0e0c8;
+            --color-red-status: #8b2020;
+            --color-red-highlight: #f0cccc;
+            --color-blue-status: #1a5480;
+            --color-blue-highlight: #c8ddf0;
+
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.25rem;
+            --radius-full: 9999px;
+        }
+
+        /* ── Dark theme ─────────────────────────────────────────────────────────── */
+        [data-theme="dark"] {
+            --color-bg: #141210;
+            --color-surface: #1a1815;
+            --color-surface-2: #1f1d1a;
+            --color-surface-offset: #1d1b18;
+            --color-surface-dynamic: #2a2822;
+            --color-divider: #2e2c26;
+            --color-border: #3a3830;
+            --color-text: #d8d2c0;
+            --color-text-muted: #7a7260;
+            --color-text-faint: #5a5448;
+            --color-text-inverse: #2a2820;
+            --color-primary: #52a882;
+            --color-primary-hover: #3a9068;
+            --color-primary-active: #2a7050;
+            --color-primary-highlight: #213028;
+            --color-amber: #d48c42;
+            --color-amber-highlight: #3a2818;
+            --color-red-status: #d46060;
+            --color-red-highlight: #2e1818;
+            --color-blue-status: #5090c8;
+            --color-blue-highlight: #182438;
+        }
+
+        /* ── Base reset ─────────────────────────────────────────────────────────── */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100dvh;
+            line-height: 1.6;
+            transition: background-color 250ms ease, color 250ms ease;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* ── Focus ring ─────────────────────────────────────────────────────────── */
+        :focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 3px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ── Text selection ─────────────────────────────────────────────────────── */
+        ::selection {
+            background: color-mix(in oklch, var(--color-primary) 25%, transparent);
+            color: var(--color-text);
+        }
+
+        /* ── Shimmer skeleton animation ─────────────────────────────────────────── */
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(
+                    90deg,
+                    var(--color-surface-offset) 25%,
+                    var(--color-surface-dynamic) 50%,
+                    var(--color-surface-offset) 75%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.8s ease-in-out infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ── Card hover lift ────────────────────────────────────────────────────── */
+        .bird-card {
+            background: var(--color-surface);
+            border: 1px solid oklch(from var(--color-text) l c h / 0.1);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 200ms ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bird-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 28px oklch(0.2 0.05 130 / 0.14);
+            border-color: oklch(from var(--color-primary) l c h / 0.35);
+        }
+
+        .bird-card:active {
+            transform: translateY(-1px);
+        }
+
+        /* ── Image placeholder ──────────────────────────────────────────────────── */
+        .img-placeholder {
+            background: linear-gradient(135deg, var(--color-surface-offset) 0%, var(--color-surface-dynamic) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--color-text-faint);
+        }
+
+        /* ── Status badge ───────────────────────────────────────────────────────── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-full);
+            font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .badge-lc {
+            background: var(--color-primary-highlight);
+            color: var(--color-primary);
+        }
+
+        .badge-nt {
+            background: var(--color-blue-highlight);
+            color: var(--color-blue-status);
+        }
+
+        .badge-vu {
+            background: var(--color-amber-highlight);
+            color: var(--color-amber);
+        }
+
+        .badge-en {
+            background: oklch(from var(--color-amber) l c h / 0.15);
+            color: color-mix(in oklch, var(--color-amber) 80%, var(--color-red-status));
+        }
+
+        .badge-cr {
+            background: var(--color-red-highlight);
+            color: var(--color-red-status);
+        }
+
+        .badge-ew {
+            background: oklch(from var(--color-red-status) l c h / 0.18);
+            color: var(--color-red-status);
+        }
+
+        .badge-ex {
+            background: color-mix(in oklch, var(--color-text-faint) 20%, transparent);
+            color: var(--color-text-muted);
+        }
+
+        .badge-dd {
+            background: color-mix(in oklch, var(--color-text-faint) 15%, transparent);
+            color: var(--color-text-muted);
+        }
+
+        /* ── Nav / Header ───────────────────────────────────────────────────────── */
+        .site-header {
+            background: color-mix(in oklch, var(--color-surface) 90%, transparent);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid oklch(from var(--color-text) l c h / 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+
+        /* ── Habitat pill ───────────────────────────────────────────────────────── */
+        .habitat-pill {
+            background: color-mix(in oklch, var(--color-primary) 10%, var(--color-surface-offset));
+            color: var(--color-primary);
+            border-radius: var(--radius-full);
+            padding: 0.15rem 0.55rem;
+            font-size: clamp(0.65rem, 1.5vw, 0.72rem);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        /* ── Search bar ─────────────────────────────────────────────────────────── */
+        .search-input {
+            background: var(--color-surface-2);
+            border: 1px solid oklch(from var(--color-text) l c h / 0.12);
+            border-radius: var(--radius-full);
+            color: var(--color-text);
+            transition: border-color 180ms ease, box-shadow 180ms ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-primary) 18%, transparent);
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--color-text-faint);
+        }
+
+        /* ── Theme toggle ───────────────────────────────────────────────────────── */
+        .theme-toggle {
+            background: var(--color-surface-offset);
+            border: 1px solid oklch(from var(--color-text) l c h / 0.1);
+            border-radius: var(--radius-full);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+            transition: background 180ms ease, color 180ms ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--color-surface-dynamic);
+            color: var(--color-text);
+        }
+
+        /* ── Page fade-in ───────────────────────────────────────────────────────── */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bird-card {
+            animation: fadeUp 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ── Card image container keeps consistent ratio ────────────────────────── */
+        .card-image-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            background: var(--color-surface-offset);
+        }
+
+        .card-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .bird-card:hover .card-image-wrap img {
+            transform: scale(1.04);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ═══════════════════════════ HEADER ══════════════════════════════════ -->
+<header class="site-header">
+    <div style="max-width:1200px; margin-inline:auto; padding:0 1.25rem;">
+        <div style="display:flex; align-items:center; justify-content:space-between; height:60px; gap:1rem;">
+
+            <!-- Logo -->
+            <a href="#"
+               style="display:flex; align-items:center; gap:0.6rem; text-decoration:none; color:var(--color-text); flex-shrink:0;">
+                <!-- SVG logo: a stylised flying swallow silhouette -->
+                <svg aria-label="Bird Guide logo" width="32" height="32" viewBox="0 0 32 32" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="15" fill="color-mix(in oklch, var(--color-primary) 15%, transparent)"
+                            stroke="var(--color-primary)" stroke-width="1.2"/>
+                    <!-- Body -->
+                    <ellipse cx="16" cy="17" rx="5" ry="2.2" fill="var(--color-primary)" transform="rotate(-8 16 17)"/>
+                    <!-- Left wing -->
+                    <path d="M11 16 Q5 11 3 14 Q7 17 11 17Z" fill="var(--color-primary)"/>
+                    <!-- Right wing -->
+                    <path d="M21 16 Q27 11 29 14 Q25 17 21 17Z" fill="var(--color-primary)"/>
+                    <!-- Tail fork -->
+                    <path d="M13.5 19.5 Q11 23 9 24" stroke="var(--color-primary)" stroke-width="1.4"
+                          stroke-linecap="round"/>
+                    <path d="M14.5 19.5 Q13 23.5 12 25" stroke="var(--color-primary)" stroke-width="1.4"
+                          stroke-linecap="round"/>
+                </svg>
+                <span style="font-family:var(--font-display); font-size:1.2rem; font-weight:600; letter-spacing:-0.01em;">Bird Guide</span>
+            </a>
+
+            <!-- Search -->
+            <div style="flex:1; max-width:420px; position:relative; display:flex; align-items:center;">
+                <i data-lucide="search"
+                   style="position:absolute; left:0.75rem; width:16px; height:16px; color:var(--color-text-faint); pointer-events:none;"></i>
+                <input
+                        id="search"
+                        class="search-input"
+                        type="search"
+                        placeholder="Search birds…"
+                        aria-label="Search birds"
+                        style="width:100%; padding:0.45rem 0.75rem 0.45rem 2.2rem; font-size:0.875rem;"
+                >
+            </div>
+
+            <!-- Theme toggle -->
+            <button class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- ═══════════════════════════ HERO BAND ════════════════════════════════ -->
+<section
+        style="background:linear-gradient(135deg, color-mix(in oklch, var(--color-primary) 12%, var(--color-bg)) 0%, var(--color-bg) 60%); border-bottom:1px solid oklch(from var(--color-text) l c h / 0.07); padding:2.5rem 1.25rem 2rem;">
+    <div style="max-width:1200px; margin-inline:auto;">
+        <p style="font-family:var(--font-display); font-size:clamp(1.6rem, 4vw, 2.4rem); font-weight:600; line-height:1.15; color:var(--color-text); margin-bottom:0.4rem;">
+            Explore the World's Birds
+        </p>
+        <p id="result-count" style="font-size:0.9rem; color:var(--color-text-muted);">Loading species…</p>
+    </div>
+</section>
+
+<!-- ═══════════════════════════ FILTERS ══════════════════════════════════ -->
+<section
+        style="background:var(--color-surface); border-bottom:1px solid oklch(from var(--color-text) l c h / 0.07); padding:0.7rem 1.25rem; overflow-x:auto;">
+    <div style="max-width:1200px; margin-inline:auto; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+        <span style="font-size:0.78rem; color:var(--color-text-muted); font-weight:500; white-space:nowrap; margin-right:0.25rem;">Status:</span>
+        <button class="filter-btn active" data-filter="all"
+                style="border-radius:var(--radius-full); padding:0.25rem 0.8rem; font-size:0.78rem; font-weight:500; border:1px solid oklch(from var(--color-text) l c h / 0.15); background:var(--color-primary); color:var(--color-text-inverse); cursor:pointer; transition:background 180ms ease;">
+            All
+        </button>
+        <button class="filter-btn" data-filter="LC"
+                style="border-radius:var(--radius-full); padding:0.25rem 0.8rem; font-size:0.78rem; font-weight:500; border:1px solid oklch(from var(--color-text) l c h / 0.15); background:var(--color-surface-offset); color:var(--color-text-muted); cursor:pointer; transition:background 180ms ease, color 180ms ease;">
+            Least Concern
+        </button>
+        <button class="filter-btn" data-filter="NT"
+                style="border-radius:var(--radius-full); padding:0.25rem 0.8rem; font-size:0.78rem; font-weight:500; border:1px solid oklch(from var(--color-text) l c h / 0.15); background:var(--color-surface-offset); color:var(--color-text-muted); cursor:pointer; transition:background 180ms ease, color 180ms ease;">
+            Near Threatened
+        </button>
+        <button class="filter-btn" data-filter="VU"
+                style="border-radius:var(--radius-full); padding:0.25rem 0.8rem; font-size:0.78rem; font-weight:500; border:1px solid oklch(from var(--color-text) l c h / 0.15); background:var(--color-surface-offset); color:var(--color-text-muted); cursor:pointer; transition:background 180ms ease, color 180ms ease;">
+            Vulnerable
+        </button>
+        <button class="filter-btn" data-filter="EN"
+                style="border-radius:var(--radius-full); padding:0.25rem 0.8rem; font-size:0.78rem; font-weight:500; border:1px solid oklch(from var(--color-text) l c h / 0.15); background:var(--color-surface-offset); color:var(--color-text-muted); cursor:pointer; transition:background 180ms ease, color 180ms ease;">
+            Endangered
+        </button>
+        <button class="filter-btn" data-filter="CR"
+                style="border-radius:var(--radius-full); padding:0.25rem 0.8rem; font-size:0.78rem; font-weight:500; border:1px solid oklch(from var(--color-text) l c h / 0.15); background:var(--color-surface-offset); color:var(--color-text-muted); cursor:pointer; transition:background 180ms ease, color 180ms ease;">
+            Critical
+        </button>
+    </div>
+</section>
+
+<!-- ═══════════════════════════ GRID ══════════════════════════════════════ -->
+<main id="main-content" style="max-width:1200px; margin-inline:auto; padding:2rem 1.25rem 4rem;">
+
+    <!-- Bird grid — populated by JS demo / Jinja template integration note below -->
+    <div id="bird-grid"
+         style="display:grid; grid-template-columns:repeat(auto-fill, minmax(min(280px, 100%), 1fr)); gap:1.25rem;">
+        <!-- Cards injected here -->
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state"
+         style="display:none; flex-direction:column; align-items:center; text-align:center; padding:5rem 2rem; color:var(--color-text-muted);">
+        <i data-lucide="bird" style="width:48px; height:48px; margin-bottom:1rem; color:var(--color-text-faint);"></i>
+        <h3 style="font-family:var(--font-display); font-size:1.15rem; color:var(--color-text); margin-bottom:0.5rem;">
+            No birds found</h3>
+        <p style="max-width:36ch; font-size:0.9rem;">Try a different search term or remove the status filter.</p>
+    </div>
+</main>
+
+
+<script>
+    // ─── Theme toggle ──────────────────────────────────────────────────────
+    (function () {
+        const t = document.querySelector('[data-theme-toggle]');
+        const r = document.documentElement;
+        let d = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        r.setAttribute('data-theme', d);
+        updateToggleIcon(d);
+        t && t.addEventListener('click', () => {
+            d = d === 'dark' ? 'light' : 'dark';
+            r.setAttribute('data-theme', d);
+            t.setAttribute('aria-label', 'Switch to ' + (d === 'dark' ? 'light' : 'dark') + ' mode');
+            updateToggleIcon(d);
+        });
+
+        function updateToggleIcon(mode) {
+            if (!t) return;
+            t.innerHTML = mode === 'dark'
+                ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`
+                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+        }
+    })();
+
+    // ─── API base URL — change this if your Django server runs elsewhere ───
+    const API_BASE = window.location.origin;
+
+    // ─── Conservation status helpers ──────────────────────────────────────
+    const STATUS_MAP = {
+        EX: {label: 'Extinct', cls: 'badge-ex', dot: '#6b6454'},
+        EW: {label: 'Extinct in the Wild', cls: 'badge-ew', dot: '#8b2020'},
+        CR: {label: 'Critically Endangered', cls: 'badge-cr', dot: '#8b2020'},
+        EN: {label: 'Endangered', cls: 'badge-en', dot: '#b07030'},
+        VU: {label: 'Vulnerable', cls: 'badge-vu', dot: '#a05c1a'},
+        NT: {label: 'Near Threatened', cls: 'badge-nt', dot: '#1a5480'},
+        CD: {label: 'Conservation Dependent', cls: 'badge-nt', dot: '#1a5480'},
+        LC: {label: 'Least Concern', cls: 'badge-lc', dot: '#2d6a4f'},
+        DD: {label: 'Data Deficient', cls: 'badge-dd', dot: '#6b6454'},
+        NE: {label: 'Not Evaluated', cls: 'badge-dd', dot: '#6b6454'},
+    };
+
+    const STATUS_NAME_TO_CODE = {
+        'extinct': 'EX',
+        'extinct in the wild': 'EW',
+        'critically endangered': 'CR',
+        'endangered': 'EN',
+        'red watch list': 'EN',
+        'vulnerable': 'VU',
+        'common bird in steep decline': 'VU',
+        'restricted range': 'VU',
+        'near threatened': 'NT',
+        'declining': 'NT',
+        'conservation dependent': 'CD',
+        'least concern': 'LC',
+        'low concern': 'LC',
+        'data deficient': 'DD',
+        'not evaluated': 'NE',
+    };
+
+    function normaliseStatus(raw) {
+        if (!raw || !raw.trim()) return null;
+        const trimmed = raw.trim();
+        // Already a known abbreviation
+        if (STATUS_MAP[trimmed.toUpperCase()]) return trimmed.toUpperCase();
+        // Full name lookup (case-insensitive)
+        const fromName = STATUS_NAME_TO_CODE[trimmed.toLowerCase()];
+        if (fromName) return fromName;
+        // Unknown value — return as-is so the fallback badge still renders
+        return trimmed.toUpperCase();
+    }
+
+    function getStatusBadge(raw) {
+        if (!raw || !raw.trim()) return '';
+        const code = normaliseStatus(raw);
+        // Known status — render styled badge
+        const s = STATUS_MAP[code] || {label: code, cls: 'badge-dd', dot: '#6b6454'};
+        return `<span class="badge ${s.cls}" aria-label="Conservation status: ${s.label}">
+    <span style="width:6px;height:6px;border-radius:50%;background:${s.dot};display:inline-block;flex-shrink:0;"></span>
+    ${s.label}
+  </span>`;
+    }
+
+    // ─── Bird card renderer ────────────────────────────────────────────────
+    function createCard(bird, index) {
+        // Resolve relative image paths against the Django origin
+        if (bird.image && !bird.image.startsWith('http')) {
+            bird.image = API_BASE + bird.image;
+        }
+
+        const card = document.createElement('article');
+        card.className = 'bird-card';
+        card.style.animationDelay = `${index * 45}ms`;
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `View details for ${bird.common_name}`);
+
+        // Image or placeholder
+        let imageHTML;
+        if (bird.image) {
+            imageHTML = `
+          <div class="card-image-wrap">
+            <img
+              src="${bird.image}"
+              alt="${bird.common_name}"
+              width="280"
+              height="210"
+              loading="lazy"
+              decoding="async"
+              onerror="this.parentElement.innerHTML = getPlaceholderHTML('${bird.common_name}')"
+            >
+          </div>`;
+        } else {
+            imageHTML = `
+          <div class="card-image-wrap img-placeholder" aria-hidden="true" role="img" aria-label="No image available for ${bird.common_name}">
+            ${placeholderSVG()}
+            <span style="font-size:0.72rem; color:var(--color-text-faint);">No photo available</span>
+          </div>`;
+        }
+
+        const habitatHTML = bird.habitat
+            ? `<span class="habitat-pill">
+            <i data-lucide="map-pin" style="width:10px;height:10px;display:inline;vertical-align:middle;margin-right:2px;"></i>${bird.habitat}
+           </span>`
+            : '';
+
+        const statusHTML = getStatusBadge(bird.conservation_status);
+
+        card.innerHTML = `
+        ${imageHTML}
+        <div style="padding:1rem; flex:1; display:flex; flex-direction:column; gap:0.5rem;">
+          <div>
+            <h2 style="font-family:var(--font-display); font-size:clamp(0.95rem,2vw,1.05rem); font-weight:600; line-height:1.2; color:var(--color-text); margin-bottom:0.15rem;">${bird.common_name}</h2>
+            <p style="font-size:0.78rem; color:var(--color-text-muted); font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${bird.scientific_name}</p>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:0.35rem; align-items:center; margin-top:auto; padding-top:0.5rem; border-top:1px solid oklch(from currentColor l c h / 0.08);">
+            ${habitatHTML}
+            ${statusHTML}
+          </div>
+        </div>
+        <div style="padding:0.6rem 1rem; border-top:1px solid oklch(from currentColor l c h / 0.07); display:flex; align-items:center; justify-content:space-between; background:var(--color-surface-offset);">
+          <span style="font-size:0.75rem; color:var(--color-text-faint);">ID #${bird.id}</span>
+          <span style="font-size:0.75rem; color:var(--color-primary); display:flex; align-items:center; gap:0.25rem; font-weight:500;">
+            View details <i data-lucide="arrow-right" style="width:13px;height:13px;"></i>
+          </span>
+        </div>
+      `;
+
+        card.addEventListener('click', () => {
+            window.location.href = `/birds/${bird.id}`;
+        });
+        card.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.location.href = `/birds/${bird.id}`;
+            }
+        });
+
+        return card;
+    }
+
+    function placeholderSVG() {
+        return `<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="24" cy="18" r="6" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+        <path d="M10 38 Q14 28 24 28 Q34 28 38 38" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <path d="M6 20 Q10 15 14 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+        <path d="M42 20 Q38 15 34 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+      </svg>`;
+    }
+
+    window.getPlaceholderHTML = function (name) {
+        return `<div class="img-placeholder" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;color:var(--color-text-faint);">
+        ${placeholderSVG()}
+        <span style="font-size:0.72rem;">No photo available</span>
+      </div>`;
+    };
+
+    // ─── Render birds list ─────────────────────────────────────────────────
+    function renderBirds(birds) {
+        const grid = document.getElementById('bird-grid');
+        const empty = document.getElementById('empty-state');
+        const count = document.getElementById('result-count');
+        grid.innerHTML = '';
+        if (!birds.length) {
+            empty.style.display = 'flex';
+            count.textContent = 'No species found';
+        } else {
+            empty.style.display = 'none';
+            count.textContent = `${birds.length} species listed`;
+            birds.forEach((bird, i) => grid.appendChild(createCard(bird, i)));
+            lucide.createIcons();
+        }
+    }
+
+    // ─── Search & filter logic ─────────────────────────────────────────────
+    let allBirds = [];
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    function applyFilters() {
+        let filtered = allBirds;
+        if (activeFilter !== 'all') {
+            filtered = filtered.filter(b =>
+                b.conservation_status && b.conservation_status.toUpperCase() === activeFilter
+            );
+        }
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            filtered = filtered.filter(b =>
+                b.common_name.toLowerCase().includes(q) ||
+                b.scientific_name.toLowerCase().includes(q) ||
+                (b.habitat && b.habitat.toLowerCase().includes(q))
+            );
+        }
+        renderBirds(filtered);
+    }
+
+    document.getElementById('search').addEventListener('input', e => {
+        searchQuery = e.target.value.trim();
+        applyFilters();
+    });
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.style.background = 'var(--color-surface-offset)';
+                b.style.color = 'var(--color-text-muted)';
+                b.classList.remove('active');
+            });
+            btn.style.background = 'var(--color-primary)';
+            btn.style.color = 'var(--color-text-inverse)';
+            btn.classList.add('active');
+            activeFilter = btn.dataset.filter;
+            applyFilters();
+        });
+    });
+
+    // ─── Skeleton loaders shown while fetching ────────────────────────────
+    function showSkeletons(n = 8) {
+        const grid = document.getElementById('bird-grid');
+        grid.innerHTML = Array.from({length: n}).map(() => `
+        <div style="background:var(--color-surface);border:1px solid oklch(from var(--color-text) l c h / 0.1);border-radius:var(--radius-xl);overflow:hidden;">
+          <div class="skeleton" style="aspect-ratio:4/3;width:100%;border-radius:0;"></div>
+          <div style="padding:1rem;display:flex;flex-direction:column;gap:0.6rem;">
+            <div class="skeleton" style="height:1.1em;width:70%;border-radius:var(--radius-sm);"></div>
+            <div class="skeleton" style="height:0.85em;width:50%;border-radius:var(--radius-sm);"></div>
+            <div style="display:flex;gap:0.4rem;margin-top:0.25rem;">
+              <div class="skeleton" style="height:1.4em;width:80px;border-radius:999px;"></div>
+              <div class="skeleton" style="height:1.4em;width:90px;border-radius:999px;"></div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ─── Error state ───────────────────────────────────────────────────────
+    function showError(message) {
+        const grid = document.getElementById('bird-grid');
+        document.getElementById('result-count').textContent = 'Could not load species';
+        grid.innerHTML = `
+        <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:4rem 2rem;color:var(--color-text-muted);">
+          <i data-lucide="wifi-off" style="width:40px;height:40px;margin-bottom:1rem;color:var(--color-text-faint);"></i>
+          <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--color-text);margin-bottom:0.4rem;">Failed to load birds</h3>
+          <p style="max-width:36ch;font-size:0.875rem;margin-bottom:1.25rem;">${message}</p>
+          <button onclick="loadBirds()" style="padding:0.5rem 1.25rem;background:var(--color-primary);color:var(--color-text-inverse);border-radius:var(--radius-full);font-size:0.875rem;font-weight:500;border:none;cursor:pointer;transition:background 180ms ease;" onmouseover="this.style.background='var(--color-primary-hover)'" onmouseout="this.style.background='var(--color-primary)'">
+            Try again
+          </button>
+        </div>`;
+        lucide.createIcons();
+    }
+
+    // ─── Fetch from GET /birds ─────────────────────────────────────────────
+    async function loadBirds() {
+        showSkeletons();
+        document.getElementById('result-count').textContent = 'Loading species…';
+        try {
+            const response = await fetch('/birds', {
+                headers: {'Accept': 'application/json'}
+            });
+            if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+            allBirds = await response.json();
+
+            allBirds.forEach(bird => {
+                bird.conservation_status = normaliseStatus(bird.conservation_status);
+            });
+
+            applyFilters();
+            lucide.createIcons();
+        } catch (err) {
+            showError(err.message || 'An unexpected error occurred.');
+        }
+    }
+
+    loadBirds();
+</script>
+</body>
+</html>

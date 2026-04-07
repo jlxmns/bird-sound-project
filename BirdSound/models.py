@@ -35,7 +35,7 @@ class Bird(models.Model):
     habitat = models.TextField(null=True, blank=True)
     conservation_status = models.CharField(max_length=50, null=True, blank=True)
 
-    image = models.ImageField(upload_to="birds/", null=True, blank=True)
+    image = models.ImageField(upload_to="images/", null=True, blank=True)
     description = models.TextField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

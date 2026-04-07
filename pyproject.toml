@@ -9,5 +9,6 @@ dependencies = [
     "django-bolt>=0.7.4",
     "pillow>=12.2.0",
     "psycopg>=3.3.3",
+    "python-dotenv>=1.2.2",
     "ruff>=0.15.9",
 ]

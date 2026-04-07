@@ -60,13 +60,25 @@ Esse comando criará um virtual environment e instalará todas as dependências 
 ### 4. Aplique as migrações no banco de dados
 
 ```bash
-uv run python manage.py migrate
+python manage.py migrate
 ```
 
-### 5. Rode o servidor de desenvolvimento
+### 5. Popule seu banco de dados com dados iniciais
+
+Você pode acessar o site da API Nuthatch através do link **https://nuthatch.lastelm.software/**
+
+Você deverá criar uma chave da API para usar o comando e popular parcialmente o banco de dados com uma lista de pássaros.
+
+Você pode usar o arquivo `.env.sample` como exemplo para criar seu arquivo `.env` e inserir sua chave da API. Você poderá então popular seu banco de dados rodando o comando:
 
 ```bash
-uv run python manage.py runbolt --dev
+python manage.py seed_birds
+```
+
+### 6. Rode o servidor de desenvolvimento
+
+```bash
+python manage.py runbolt --dev
 ```
 
 A API estará disponível em **http://127.0.0.1:8000**.
@@ -84,7 +96,7 @@ O painel de administração estará disponível em **http://127.0.0.1:8000/admin
 Para acessar o painel de administração do django em `/admin`:
 
 ```bash
-uv run python manage.py createsuperuser
+python manage.py createsuperuser
 ```
 
 Siga as instruções para definir um nome de usuário, email e senha.
